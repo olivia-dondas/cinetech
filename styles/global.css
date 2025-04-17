@@ -1,0 +1,84 @@
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  color: #222;
+  z-index: 1001;
+  border-radius: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  padding: 2em;
+  max-width: 500px;
+  width: 95vw;
+  animation: modalIn 0.25s cubic-bezier(0.4, 2, 0.6, 1) both;
+}
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translate(-50%, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%);
+  }
+}
+.modal-close {
+  position: absolute;
+  right: 18px;
+  top: 12px;
+  background: none;
+  border: none;
+  font-size: 2em;
+  color: #f800b4;
+  cursor: pointer;
+}
+.modal-content img {
+  border-radius: 10px;
+}
+.comment {
+  background: #f3f3f3;
+  color: #222;
+  margin-bottom: 0.5em;
+  padding: 0.5em 1em;
+  border-radius: 8px;
+}
+#commentForm {
+  margin-top: 1em;
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+#commentForm input[type="text"] {
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  padding: 0.3em 0.6em;
+}
+#commentForm button {
+  background: #f800b4;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.3em 1.2em;
+  cursor: pointer;
+}
+
+.movie-card {
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+}
+.movie-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
