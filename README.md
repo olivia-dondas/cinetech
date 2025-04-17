@@ -78,13 +78,5 @@ Bingerz, c’est le terrain d’expérimentation idéal pour moi afin de découv
 
 ---
 
-## ✨ À venir ?
 
-- Filtres avancés par genre, année, pays
-- Système de vote local
-- Animation des éléments à l’aide de bibliothèques JS
-- Ajout d’un mode sombre 🌙
-
----
-
-> 💡 *Bingerz est un projet vivant, tout comme ma passion pour le code et le cinéma. Stay tuned !*
+> 💡 *Bingerz est un projet vivant, tout comme ma passion pour le code et le cinéma. Stay tuned !* 
