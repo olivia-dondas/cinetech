@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bingerz - Tous les films</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/movies.css" />
+    <script src="api/api.js" defer></script>
+    <script src="js/movie.js" defer></script>
+  </head>
+  <body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Header (identique à index.html) -->
+    <header
+      class="flex flex-col md:flex-row justify-between items-center px-6 md:px-10 py-4 md:py-6 bg-white shadow-md sticky top-0 z-50"
+    >
+      <div class="flex items-center space-x-4 mb-4 md:mb-0">
+        <img src="assets/bingerz.png" alt="Bingerz Logo" class="h-10" />
+      </div>
+      <nav class="flex flex-wrap justify-center items-center gap-4 md:gap-8">
+        <a href="index.html" class="hover:text-red-500 transition font-medium"
+          >Accueil</a
+        >
+        <a href="movies.html" class="text-red-600 font-bold">Films</a>
+        <a href="series.html" class="hover:text-red-500 transition">Séries</a>
+        <a href="favorites.html" class="hover:text-red-500 transition"
+          >Favoris</a
+        >
+      </nav>
+    </header>
+
+    <!-- Barre de recherche et filtres -->
+    <section
+      class="bg-white shadow-md py-6 px-4 md:px-10 flex flex-col md:flex-row md:items-end gap-4 sticky top-[74px] z-40"
+    >
+      <form
+        id="movie-search-form"
+        class="flex-1 flex flex-col md:flex-row gap-4 items-end"
+      >
+        <div class="flex-1">
+          <label for="search-query" class="block text-sm font-bold mb-1"
+            >Recherche</label
+          >
+          <input
+            type="text"
+            id="search-query"
+            name="query"
+            placeholder="Titre, acteur, réalisateur..."
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-300"
+          />
+        </div>
+        <div>
+          <label for="genre-filter" class="block text-sm font-bold mb-1"
+            >Genre</label
+          >
+          <select
+            id="genre-filter"
+            name="genre"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300"
+          >
+            <option value="">Tous</option>
+            <!-- Genres dynamiquement injectés -->
+          </select>
+        </div>
+        <div>
+          <label for="year-filter" class="block text-sm font-bold mb-1"
+            >Année</label
+          >
+          <select
+            id="year-filter"
+            name="year"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300"
+          >
+            <option value="">Toutes</option>
+            <!-- Années dynamiquement injectées -->
+          </select>
+        </div>
+        <div>
+          <label for="sort-filter" class="block text-sm font-bold mb-1"
+            >Trier par</label
+          >
+          <select
+            id="sort-filter"
+            name="sort"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300"
+          >
+            <option value="popularity.desc">Popularité ↓</option>
+            <option value="popularity.asc">Popularité ↑</option>
+            <option value="release_date.desc">Date de sortie ↓</option>
+            <option value="release_date.asc">Date de sortie ↑</option>
+            <option value="vote_average.desc">Note ↓</option>
+            <option value="vote_average.asc">Note ↑</option>
+          </select>
+        </div>
+        <button
+          type="submit"
+          class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition font-medium mt-4 md:mt-0"
+        >
+          Rechercher
+        </button>
+      </form>
+    </section>
+
+    <!-- Résultats -->
+    <main class="px-4 md:px-10 py-8 max-w-7xl mx-auto">
+      <section>
+        <h1 class="text-3xl font-bold mb-8 text-gray-800">Tous les films</h1>
+        <div
+          id="movies-list"
+          class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+        ></div>
+        <!-- Pagination -->
+        <div
+          id="pagination"
+          class="flex justify-center items-center gap-2 mt-10"
+        ></div>
+      </section>
+    </main>
+
+    <!-- Modal détails/commentaires -->
+    <div id="modalContainer"></div>
+  </body>
+</html>
