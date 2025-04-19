@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Favoris - Bingerz</title>
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-50">
+    <!-- Header (identique) -->
+    <header>...</header>
+
+    <main class="container mx-auto px-4 py-6">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">Vos Favoris</h1>
+
+      <div
+        id="favorites-container"
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+      >
+        <!-- Les favoris seront chargés dynamiquement -->
+      </div>
+
+      <div id="empty-message" class="text-center py-10 hidden">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-16 w-16 mx-auto text-gray-400 mb-3"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <p class="text-gray-500 text-lg">
+          Vous n'avez aucun favoris enregistré
+        </p>
+        <a
+          href="movies.html"
+          class="mt-4 inline-block px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Explorer les films
+        </a>
+      </div>
+    </main>
+
+    <!-- Footer (identique) -->
+    <footer>...</footer>
+
+    <!-- Modal (identique) -->
+    <div id="modal-container" class="hidden">...</div>
+
+    <script src="api/api.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const favorites = getFavorites();
+        const container = document.getElementById("favorites-container");
+        const emptyMsg = document.getElementById("empty-message");
+
+        if (favorites.length === 0) {
+          container.classList.add("hidden");
+          emptyMsg.classList.remove("hidden");
+        } else {
+          emptyMsg.classList.add("hidden");
+          renderFavorites(favorites, container);
+        }
+      });
+    </script>
+  </body>
+</html>
