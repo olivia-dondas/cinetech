@@ -13,11 +13,15 @@ const fetchAPI = async (endpoint, params = {}) => {
       url.searchParams.set(key, value);
     });
     const response = await fetch(url);
-    if (!response.ok)
+    if (!response.ok) {
+      console.error(
+        `Erreur API (${endpoint}): ${response.status} ${response.statusText}`
+      );
       throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+    }
     return await response.json();
   } catch (error) {
-    console.error(`Erreur API (${endpoint}):`, error);
+    console.error(`Erreur lors de l'appel à l'API (${endpoint}):`, error);
     return { results: [], error: true };
   }
 };
@@ -28,6 +32,13 @@ const createCard = (item, type) => {
   const imageUrl = item.poster_path
     ? `${IMAGE_BASE_URL}w500${item.poster_path}`
     : "assets/placeholder.jpg";
+
+  // Vérifiez si l'élément est déjà dans les favoris
+  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  const isFavorite = favorites.some(
+    (fav) => fav.id === item.id && fav.media_type === type
+  );
+
   const card = document.createElement("div");
   card.className =
     "min-w-[180px] bg-white shadow-lg rounded-lg overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer";
@@ -38,18 +49,55 @@ const createCard = (item, type) => {
       <span class="text-xs px-2 py-1 bg-gray-200 rounded-full">${
         type === "movie" ? "Film" : "Série"
       }</span>
-      <button class="add-fav-btn" style="float:right;" title="Ajouter aux favoris">♥</button>
+      <button class="add-fav-btn ${
+        isFavorite ? "active" : ""
+      }" style="float:right;" title="Ajouter aux favoris">♥</button>
     </div>
   `;
+
   // Modal au clic (hors bouton favoris)
   card.addEventListener("click", (e) => {
     if (!e.target.classList.contains("add-fav-btn")) openModal(item, type);
   });
-  // Ajout favoris
+
+  // Ajout ou suppression des favoris
   card.querySelector(".add-fav-btn").addEventListener("click", (e) => {
     e.stopPropagation();
-    addToFavorites(item.id, type);
+    const btn = e.target;
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    const isFavorite = favorites.some(
+      (fav) => fav.id === item.id && fav.media_type === type
+    );
+
+    if (isFavorite) {
+      // Supprimer des favoris
+      const updatedFavorites = favorites.filter(
+        (fav) => !(fav.id === item.id && fav.media_type === type)
+      );
+      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      btn.classList.remove("active");
+      showNotification("Retiré des favoris", "info");
+    } else {
+      // Ajouter aux favoris
+      const newFavorite = {
+        id: item.id,
+        title: item.title || item.name,
+        poster_path: item.poster_path,
+        media_type: type,
+        vote_average: item.vote_average,
+        overview: item.overview,
+        added_at: new Date().toISOString(),
+      };
+      const updatedFavorites = [...favorites, newFavorite];
+      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      btn.classList.add("active");
+      showNotification("Ajouté aux favoris !", "success");
+    }
+
+    // Mettre à jour la liste des favoris
+    fetchFavorites();
   });
+
   return card;
 };
 
@@ -207,8 +255,27 @@ async function openModal(item, type) {
     const url = type === "movie" ? `/movie/${item.id}` : `/tv/${item.id}`;
     details = await fetchAPI(url);
   }
+
+  // Récupère les reviews de TMDb
+  const reviewsData = await fetchAPI(`/${type}/${item.id}/reviews`);
+  console.log("Reviews récupérées :", reviewsData); // Ajoutez ce log
+  const reviews = reviewsData.results || [];
+
+  // Récupère les commentaires locaux
   const commentsKey = `comments_${type}_${item.id}`;
-  const comments = JSON.parse(localStorage.getItem(commentsKey)) || [];
+  const localComments = JSON.parse(localStorage.getItem(commentsKey)) || [];
+
+  // Combine les reviews TMDb et les commentaires locaux
+  const allComments = [
+    ...reviews.map((review) => ({
+      name: review.author,
+      text: review.content,
+    })),
+    ...localComments,
+  ];
+  console.log("Commentaires combinés :", allComments); // Ajoutez ce log
+
+  // Affiche les détails et les commentaires
   document.getElementById("modal-content").innerHTML = `
     <img src="${
       details.poster_path
@@ -224,8 +291,8 @@ async function openModal(item, type) {
     <h3>Commentaires</h3>
     <div id="commentsList">
       ${
-        comments.length
-          ? comments
+        allComments.length
+          ? allComments
               .map(
                 (c) =>
                   `<div class="comment" style="background:#f3f3f3;color:#222;margin-bottom:0.5em;padding:0.5em 1em;border-radius:8px;"><b>${c.name}</b> : ${c.text}</div>`
@@ -240,12 +307,20 @@ async function openModal(item, type) {
       <button type="submit">Ajouter</button>
     </form>
   `;
+  document.getElementById("commentsList").innerHTML = allComments.length
+    ? allComments
+        .map(
+          (c) =>
+            `<div class="comment" style="background:#f3f3f3;color:#222;margin-bottom:0.5em;padding:0.5em 1em;border-radius:8px;"><b>${c.name}</b> : ${c.text}</div>`
+        )
+        .join("")
+    : "<em>Aucun commentaire.</em>";
   document.getElementById("commentForm").onsubmit = function (e) {
     e.preventDefault();
     const name = document.getElementById("commentName").value.trim();
     const text = document.getElementById("commentText").value.trim();
     if (!name || !text) return;
-    const newComments = [...comments, { name, text }];
+    const newComments = [...localComments, { name, text }];
     localStorage.setItem(commentsKey, JSON.stringify(newComments));
     document.getElementById("commentsList").innerHTML = newComments
       .map(
@@ -263,10 +338,4 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchPopularSeries();
   fetchTrendingSeries("day"); // "day" ou "week"
   fetchFavorites();
-  // Films par genre (exemple)
-  fetchByGenre("movie", 35, "comedy-carousel");
-  fetchByGenre("movie", 28, "action-carousel");
-  fetchByGenre("movie", 10749, "romantic-carousel");
-  fetchByGenre("movie", 10751, "family-carousel");
-  fetchByGenre("movie", 27, "horror-carousel");
 });
