@@ -349,3 +349,110 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchTrendingSeries("day"); // "day" ou "week"
   fetchFavorites();
 });
+
+// Fonction d'autocomplétion globale
+const setupGlobalSearch = () => {
+  const searchInput = document.getElementById('global-search-input');
+  const resultsContainer = document.getElementById('global-search-results');
+
+  if (!searchInput || !resultsContainer) return;
+
+  let timeoutId;
+
+  // Fonction de recherche avec debounce
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(timeoutId);
+    const query = e.target.value.trim();
+
+    if (query.length < 2) {
+      resultsContainer.classList.add('hidden');
+      return;
+    }
+
+    timeoutId = setTimeout(async () => {
+      try {
+        resultsContainer.innerHTML = '<div class="p-3 text-gray-500">Recherche en cours...</div>';
+        resultsContainer.classList.remove('hidden');
+
+        // Recherche multi-type (films + séries)
+        const [movies, series] = await Promise.all([
+          fetchAPI('/search/movie', { query, page: 1 }),
+          fetchAPI('/search/tv', { query, page: 1 })
+        ]);
+
+        displayCombinedResults(movies.results, series.results, resultsContainer, searchInput.value);
+      } catch (error) {
+        console.error('Erreur recherche globale:', error);
+        resultsContainer.innerHTML = '<div class="p-3 text-red-500">Erreur de recherche</div>';
+      }
+    }, 300); // Délai de 300ms
+  });
+
+  // Cacher les résultats quand on clique ailleurs
+  document.addEventListener('click', (e) => {
+    if (!resultsContainer.contains(e.target) && e.target !== searchInput) {
+      resultsContainer.classList.add('hidden');
+    }
+  });
+};
+
+// Afficher les résultats combinés
+function displayCombinedResults(movies = [], series = [], container, query) {
+  if (movies.length === 0 && series.length === 0) {
+    container.innerHTML = '<div class="p-3 text-gray-500">Aucun résultat trouvé</div>';
+    return;
+  }
+
+  let html = '';
+
+  // Films
+  if (movies.length > 0) {
+    html += `<div class="px-3 py-2 bg-gray-100 text-sm font-semibold">Films</div>`;
+    movies.slice(0, 5).forEach(movie => {
+      html += `
+        <a href="#" class="block px-3 py-2 hover:bg-gray-100 flex items-center search-result-item" 
+           data-id="${movie.id}" data-type="movie">
+          <img src="${movie.poster_path ? IMAGE_BASE_URL + 'w92' + movie.poster_path : 'assets/placeholder.jpg'}" 
+               alt="${movie.title}" 
+               class="w-8 h-12 object-cover rounded mr-3">
+          <span>${movie.title} (${movie.release_date ? movie.release_date.substring(0, 4) : 'N/A'})</span>
+        </a>
+      `;
+    });
+  }
+
+  // Séries
+  if (series.length > 0) {
+    html += `<div class="px-3 py-2 bg-gray-100 text-sm font-semibold">Séries</div>`;
+    series.slice(0, 5).forEach(show => {
+      html += `
+        <a href="#" class="block px-3 py-2 hover:bg-gray-100 flex items-center search-result-item" 
+           data-id="${show.id}" data-type="tv">
+          <img src="${show.poster_path ? IMAGE_BASE_URL + 'w92' + show.poster_path : 'assets/placeholder.jpg'}" 
+               alt="${show.name}" 
+               class="w-8 h-12 object-cover rounded mr-3">
+          <span>${show.name} (${show.first_air_date ? show.first_air_date.substring(0, 4) : 'N/A'})</span>
+        </a>
+      `;
+    });
+  }
+
+  container.innerHTML = html;
+
+  // Ajouter des gestionnaires d'événements pour ouvrir la modal
+  container.querySelectorAll('.search-result-item').forEach(item => {
+    item.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const id = item.getAttribute('data-id');
+      const type = item.getAttribute('data-type');
+      const details = await fetchAPI(`/${type}/${id}`);
+      openModal(details, type);
+    });
+  });
+}
+
+// N'oubliez pas d'appeler cette fonction dans votre initialisation
+document.addEventListener('DOMContentLoaded', () => {
+  // ... autres initialisations ...
+  setupGlobalSearch();
+});

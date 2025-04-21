@@ -246,3 +246,19 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(updateButtons, 300);
   }
 });
+function handleSearchOnPageLoad() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchQuery = urlParams.get('search');
+  
+  if (searchQuery) {
+    searchInput.value = searchQuery;
+    currentQuery = searchQuery;
+    loadMovies(); // ou loadSeries() pour series.js
+  }
+}
+
+// Appelez cette fonction dans votre initialisation
+document.addEventListener('DOMContentLoaded', () => {
+  handleSearchOnPageLoad();
+  // ... reste de votre code ...
+});
