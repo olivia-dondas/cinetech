@@ -172,7 +172,7 @@ const showNotification = (message, type = "success") => {
 
 // --- FILMS POPULAIRES ---
 const fetchPopularMovies = async () => {
-  const container = document.getElementById("movies-list");
+  const container = document.getElementById("popular-movies"); // Changé de "movies-list" à "popular-movies"
   if (!container) return;
   container.innerHTML = '<div class="text-center py-10">Chargement...</div>';
   const data = await fetchAPI("/movie/popular");
@@ -181,12 +181,14 @@ const fetchPopularMovies = async () => {
     return;
   }
   container.innerHTML = "";
-  data.results.forEach((movie) => {
+  data.results.slice(0, 10).forEach((movie) => {
     const card = createCard(movie, "movie");
-    container.appendChild(card); // Si card est null, cela provoque l'erreur
+    if (card) {
+      // Ajout d'une vérification pour éviter les erreurs si card est null
+      container.appendChild(card);
+    }
   });
 };
-
 // --- SÉRIES POPULAIRES ---
 const fetchPopularSeries = async () => {
   const container = document.getElementById("popular-series");
@@ -198,7 +200,7 @@ const fetchPopularSeries = async () => {
     return;
   }
   container.innerHTML = "";
-  data.results.forEach((serie) => {
+  data.results.slice(0, 10).forEach((serie) => {
     const card = createCard(serie, "tv");
     if (card) {
       // Vérifiez si la carte n'est pas null
@@ -218,7 +220,7 @@ const fetchTrendingSeries = async (period = "day") => {
     return;
   }
   container.innerHTML = "";
-  data.results.slice(0, 12).forEach((serie) => {
+  data.results.slice(0, 10).forEach((serie) => {
     container.appendChild(createCard(serie, "tv"));
   });
 };
