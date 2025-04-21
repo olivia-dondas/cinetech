@@ -202,3 +202,58 @@ function renderPagination() {
     return span;
   }
 }
+
+function fetchFavoriteMoviesCarousel() {
+  const container = document.getElementById("favorites-carousel");
+  if (!container) return;
+  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  const movieFavorites = favorites.filter(
+    (item) => item.media_type === "movie"
+  );
+  container.innerHTML = "";
+  if (movieFavorites.length === 0) {
+    container.innerHTML = `<div class="text-gray-500 text-center py-8">Aucun film favori enregistré</div>`;
+    return;
+  }
+  movieFavorites.forEach((item) => {
+    const card = createCard(item, "movie");
+    card.classList.add("min-w-[180px]", "max-w-[200px]", "flex-shrink-0");
+    container.appendChild(card);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await initGenres();
+  initYears();
+  fetchFavoriteMoviesCarousel();
+  loadMovies();
+  // ...
+});
+
+// Navigation carrousel favoris
+document.addEventListener("DOMContentLoaded", () => {
+  const carousel = document.getElementById("favorites-carousel");
+  const prevBtn = document.getElementById("fav-prev");
+  const nextBtn = document.getElementById("fav-next");
+
+  function scrollByAmount(amount) {
+    if (carousel) carousel.scrollBy({ left: amount, behavior: "smooth" });
+  }
+
+  if (prevBtn && nextBtn && carousel) {
+    prevBtn.onclick = () => scrollByAmount(-carousel.offsetWidth * 0.8);
+    nextBtn.onclick = () => scrollByAmount(carousel.offsetWidth * 0.8);
+
+    // Afficher/masquer les boutons si besoin
+    const updateButtons = () => {
+      prevBtn.style.display = carousel.scrollLeft > 5 ? "block" : "none";
+      nextBtn.style.display =
+        carousel.scrollLeft + carousel.offsetWidth < carousel.scrollWidth - 5
+          ? "block"
+          : "none";
+    };
+    carousel.addEventListener("scroll", updateButtons);
+    window.addEventListener("resize", updateButtons);
+    setTimeout(updateButtons, 300);
+  }
+});
