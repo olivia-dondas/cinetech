@@ -28,10 +28,13 @@ const fetchAPI = async (endpoint, params = {}) => {
 
 // Générateur de carte (film ou série)
 const createCard = (item, type) => {
+  if (!item.poster_path) {
+    // Exclure les éléments sans affiche
+    return null;
+  }
+
   const title = item.title || item.name || "Titre inconnu";
-  const imageUrl = item.poster_path
-    ? `${IMAGE_BASE_URL}w500${item.poster_path}`
-    : "assets/placeholder.jpg";
+  const imageUrl = `${IMAGE_BASE_URL}w500${item.poster_path}`;
 
   // Vérifiez si l'élément est déjà dans les favoris
   const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
@@ -169,7 +172,7 @@ const showNotification = (message, type = "success") => {
 
 // --- FILMS POPULAIRES ---
 const fetchPopularMovies = async () => {
-  const container = document.getElementById("popular-movies");
+  const container = document.getElementById("movies-list");
   if (!container) return;
   container.innerHTML = '<div class="text-center py-10">Chargement...</div>';
   const data = await fetchAPI("/movie/popular");
@@ -178,8 +181,9 @@ const fetchPopularMovies = async () => {
     return;
   }
   container.innerHTML = "";
-  data.results.slice(0, 12).forEach((movie) => {
-    container.appendChild(createCard(movie, "movie"));
+  data.results.forEach((movie) => {
+    const card = createCard(movie, "movie");
+    container.appendChild(card); // Si card est null, cela provoque l'erreur
   });
 };
 
@@ -194,8 +198,12 @@ const fetchPopularSeries = async () => {
     return;
   }
   container.innerHTML = "";
-  data.results.slice(0, 12).forEach((serie) => {
-    container.appendChild(createCard(serie, "tv"));
+  data.results.forEach((serie) => {
+    const card = createCard(serie, "tv");
+    if (card) {
+      // Vérifiez si la carte n'est pas null
+      container.appendChild(card);
+    }
   });
 };
 
