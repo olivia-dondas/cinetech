@@ -15,7 +15,7 @@
     <script src="js/movie.js" defer></script>
   </head>
   <body class="bg-gray-50 text-gray-800 font-sans">
-    <!-- Header (identique à index.html) -->
+    <!-- Header -->
     <header
       class="flex flex-col md:flex-row justify-between items-center px-6 md:px-10 py-4 md:py-6 bg-white shadow-md sticky top-0 z-50"
     >
@@ -33,6 +33,37 @@
         >
       </nav>
     </header>
+    <section class="max-w-7xl mx-auto px-4 md:px-10 py-8">
+      <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
+        <span class="border-b-4 border-red-500 pb-2">Vos Films Favoris</span>
+      </h2>
+      <div class="relative">
+        <!-- Bouton précédent -->
+        <button
+          id="fav-prev"
+          class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-red-500 hover:text-white rounded-full shadow p-2 transition hidden md:block"
+          aria-label="Précédent"
+          style="left: -20px"
+        >
+          &#8592;
+        </button>
+        <!-- Carrousel -->
+        <div
+          id="favorites-carousel"
+          class="flex overflow-x-auto gap-6 pb-2 scrollbar-thin scrollbar-thumb-gray-300"
+          style="scroll-behavior: smooth"
+        ></div>
+        <!-- Bouton suivant -->
+        <button
+          id="fav-next"
+          class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-red-500 hover:text-white rounded-full shadow p-2 transition hidden md:block"
+          aria-label="Suivant"
+          style="right: -20px"
+        >
+          &#8594;
+        </button>
+      </div>
+    </section>
 
     <!-- Barre de recherche et filtres -->
     <section
