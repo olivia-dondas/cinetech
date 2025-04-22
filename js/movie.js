@@ -119,6 +119,11 @@ async function loadMovies() {
       '<div class="col-span-full text-center py-10 text-gray-500">Aucun film trouvé.</div>';
     return;
   }
+  if (data.total_pages > 500) {
+    totalPages = 500;
+  } else {
+    totalPages = data.total_pages;
+  }
 
   data.results.forEach((movie) => {
     moviesList.appendChild(createCard(movie, "movie"));
@@ -259,8 +264,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 function handleSearchOnPageLoad() {
   const urlParams = new URLSearchParams(window.location.search);
-  const searchQuery = urlParams.get('search');
-  
+  const searchQuery = urlParams.get("search");
+
   if (searchQuery) {
     searchInput.value = searchQuery;
     currentQuery = searchQuery;
@@ -269,7 +274,7 @@ function handleSearchOnPageLoad() {
 }
 
 // Appelez cette fonction dans votre initialisation
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   handleSearchOnPageLoad();
   // ... reste de votre code ...
 });
