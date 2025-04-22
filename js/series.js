@@ -121,6 +121,12 @@ async function loadSeries() {
     return;
   }
 
+  if (data.total_pages > 500) {
+    totalPages = 500;
+  } else {
+    totalPages = data.total_pages;
+  }
+
   data.results.forEach((serie) => {
     seriesList.appendChild(createCard(serie, "tv"));
   });
@@ -248,8 +254,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 function handleSearchOnPageLoad() {
   const urlParams = new URLSearchParams(window.location.search);
-  const searchQuery = urlParams.get('search');
-  
+  const searchQuery = urlParams.get("search");
+
   if (searchQuery) {
     searchInput.value = searchQuery;
     currentQuery = searchQuery;
@@ -258,7 +264,7 @@ function handleSearchOnPageLoad() {
 }
 
 // Appelez cette fonction dans votre initialisation
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   handleSearchOnPageLoad();
   // ... reste de votre code ...
 });
