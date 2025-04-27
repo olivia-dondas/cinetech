@@ -1,4 +1,4 @@
-![Cover](snapbingerz)
+![Cover](bingerzsap.png)
 # 🎬 Bingerz
 
 Bingerz est une bibliothèque web de films et de séries, inspirée des grandes plateformes de streaming, mais avec une touche personnelle. Ce projet a été réalisé dans le cadre de ma formation à La Plateforme à Marseille, et il représente mon **premier projet centré sur l’utilisation d’API REST et la manipulation du DOM avec JavaScript**.
